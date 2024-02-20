@@ -45,11 +45,12 @@ class SexyHttps
     private static function ParseCookie( string $resultHttp ) : bool
     {
         if ( 
-            empty(preg_match_all("#(?<=set-cookie: )\S+(?= )#i", $resultHttp, $matchCookie))
+            empty(preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie))
         ) {
             return false;
         } else {
-            self::$cookieSession[self::$url] = trim( $matchCookie[0][0], ";" );
+            $cookie = join( " ", $matchCookie[0] );
+            self::$cookieSession[self::$url] = $cookie;
             return true;
         }
     }
@@ -217,7 +218,6 @@ class SexyHttps
             $method == "POST" ?
             curl_setopt( self::$objectCurl, CURLOPT_POST, true ) :
             curl_setopt( self::$objectCurl, CURLOPT_CUSTOMREQUEST, $method );
-
             curl_setopt( self::$objectCurl, CURLOPT_POSTFIELDS, $msgPost );
         }
     }
@@ -390,7 +390,7 @@ class SexyHttps
     ) : string | null 
     {
         $str = explode( $start, $msgManege );
-        $str = explode( $end, $str[0] );  
+        $str = explode( $end, $str[1] );  
         return empty( $str[0] ) ?  null : trim( strip_tags($str[0]) );
     }
 
