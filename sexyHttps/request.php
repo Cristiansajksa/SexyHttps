@@ -28,10 +28,11 @@ class SexyHttps
         CURLOPT_TIMEOUT => 16,
         CURLOPT_HEADER => true
     ];
+
     private static object $objectCurl;
     private static string $url;
-
     public static array $configRetry = [];
+    public static float $timeTotal = 0.00;
 
 
     /**
@@ -100,15 +101,14 @@ class SexyHttps
     private static function VerifyConstValueArray( array &$arrayInfo ) : void
     {
         foreach ($arrayInfo as $key => &$value) {
+            unset( $arrayInfo[$key] );
             if (!defined( $key )) {
-                unset( $arrayInfo[$key] );
                 continue;
             }
             $value = is_file( $value ) ?
             file( $Value, FILE_IGNORE_NEW_LINES )[array_rand( file($Value, FILE_IGNORE_NEW_LINES) )] :
             $value;
 
-            unset( $arrayInfo[$key] );
             $arrayInfo[constant($key)] = $value;
         }
     }
@@ -141,7 +141,8 @@ class SexyHttps
 
 
     /** 
-    methods to collect the previous method, in case the proxies fail once, execute the retry and try 6 more times
+    methods to collect the previous method, in case the proxies fail once, 
+    execute the retry and try 6 more times
     *@access private
     *@throws exception
     *@return true
@@ -216,6 +217,7 @@ class SexyHttps
             $method == "POST" ?
             curl_setopt( self::$objectCurl, CURLOPT_POST, true ) :
             curl_setopt( self::$objectCurl, CURLOPT_CUSTOMREQUEST, $method );
+
             curl_setopt( self::$objectCurl, CURLOPT_POSTFIELDS, $msgPost );
         }
     }
@@ -296,17 +298,46 @@ class SexyHttps
     *@return object
     *@param bool $retry = true
     */
-    public static function Run( bool $retry = true ) : object | bool
+    public static function Run( 
+        string $msgExecute = "",
+         string $searchCoin = "", 
+         bool $retry = true 
+    ) : object | bool
     {
-        if (!is_object( self::$objectCurl )) {
+        if (empty( self::$objectCurl )) {
             return false;
         }
         curl_setopt_array( self::$objectCurl, self::$configCurl );
-        $resp = curl_exec( self::$objectCurl );
-        self::ParseCookie( $resp );
+        $resp = $retry ?  
+        self::executeRetrys( $msgExecute, $searchCoin ) : 
+        curl_exec( self::$objectCurl );
 
+        self::ParseCookie( $resp );
         curl_close( self::$objectCurl );
         return (object) [ "result" => $resp, "jsonArray" => self::JsonParse( $resp ) ];
+    }
+
+
+    //
+    private static function ExecuteRetrys( 
+        string $msgExecute, 
+        string $searchCoin, 
+        int $amount 
+    ) : string
+    {
+        $countRetrys = 0;
+        do {
+            $resp = curl_exec( self::$objectCurl );
+            $countRetrys++;
+        } while (
+            (stristr( $resp, $searchCoin ) and $msgExecute == $resp) and
+            $countRetrys <= $amount
+        );
+
+        if ($countRetrys > $amount) {
+            throw new exception("retry exceeded! ( $amount )");
+        }
+        return $resp;
     }
 
 
@@ -330,7 +361,8 @@ class SexyHttps
     *@return array
     *@access public
     */
-    public static function JsonParse( string $string ) : array {
+    public static function JsonParse( string $string ) : array 
+    {
         preg_match_all( "#\\{[\w\"\\[:\\,\\] ]{6,}\\}#", $string, $matchCoin );
         $jsonArray = [];
         foreach ($matchCoin[0] as $jsonCoin) {
