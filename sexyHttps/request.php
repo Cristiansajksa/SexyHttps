@@ -320,9 +320,8 @@ class SexyHttps
 
     //
     private static function ExecuteRetrys( 
-        string $msgExecute, 
-        string $searchCoin, 
-        int $amount 
+        ?string $msgExecute, 
+        ?string $searchCoin 
     ) : string
     {
         $countRetrys = 0;
@@ -331,11 +330,11 @@ class SexyHttps
             $countRetrys++;
         } while (
             (stristr( $resp, $searchCoin ) and $msgExecute == $resp) and
-            $countRetrys <= $amount
+            $countRetrys <= 7
         );
 
-        if ($countRetrys > $amount) {
-            throw new exception("retry exceeded! ( $amount )");
+        if ($countRetrys > 7) {
+            throw new exception("retry exceeded! ( 7 )");
         }
         return $resp;
     }
