@@ -65,7 +65,7 @@ class SexyHttps
     */
     private static function ModifyUrl( string $url ) : void 
     {
-        if (!fnmatch( "http*://*.*", $url )) {
+        if (empty( parse_url($url)["host"] )) {
             throw new exception("Site no pass format! ");
         }
         self::$objectCurl = curl_init( $url );
