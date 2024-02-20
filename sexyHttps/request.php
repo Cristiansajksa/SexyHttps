@@ -301,7 +301,7 @@ class SexyHttps
     public static function Run( 
         string $msgExecute = "",
          string $searchCoin = "", 
-         bool $retry = true 
+         bool $retry = false 
     ) : object | bool
     {
         if (empty( self::$objectCurl )) {
@@ -390,7 +390,7 @@ class SexyHttps
     ) : string | null 
     {
         $str = explode( $start, $msgManege );
-        $str = explode( $end, $str[$coin] );  
+        $str = explode( $end, $str[0] );  
         return empty( $str[0] ) ?  null : trim( strip_tags($str[0]) );
     }
 
