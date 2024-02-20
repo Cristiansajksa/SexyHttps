@@ -5,8 +5,6 @@ This class is made to "summarize" curl into a single class, with most of its fun
 but the difference is that the cookie sessions are encapsulated in the same class and there is no need to use txt files 
 (I am a php student, so surely it's not the best code)
 
-Made by: CristianSajksa SAD MONEY TEAM LINUX DARKA GLT HFC LNC
-
 The classes follow most of the PSR-12 standards and an easy-to-read structure.
 As psr-12 says, no method affects another area other than its own, therefore everything is encapsulated
 class methods communicate between static variables to save changes
@@ -300,7 +298,7 @@ class SexyHttps
     */
     public static function Run( bool $retry = true ) : object | bool
     {
-        if (is_object( self::$objectCurl )) {
+        if (!is_object( self::$objectCurl )) {
             return false;
         }
         curl_setopt_array( self::$objectCurl, self::$configCurl );
@@ -364,4 +362,6 @@ class SexyHttps
         $str = explode( $end, $str[$coin] );  
         return empty( $str[0] ) ?  null : trim( strip_tags($str[0]) );
     }
+
+
 }
