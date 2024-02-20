@@ -101,13 +101,13 @@ class SexyHttps
     */
     private static function VerifyConstValueArray( array &$arrayInfo ) : void
     {
-        foreach ($arrayInfo as $key => &$value) {
+        foreach ($arrayInfo as $key => $value) {
             unset( $arrayInfo[$key] );
             if (!defined( $key )) {
                 continue;
             }
             $value = is_file( $value ) ?
-            file( $Value, FILE_IGNORE_NEW_LINES )[array_rand( file($Value, FILE_IGNORE_NEW_LINES) )] :
+            file( $value, FILE_IGNORE_NEW_LINES )[array_rand( file($value, FILE_IGNORE_NEW_LINES) )] :
             $value;
 
             $arrayInfo[constant($key)] = $value;
