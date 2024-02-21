@@ -31,7 +31,7 @@ class SexyHttps
 
     private static object $objectCurl;
     private static string $url;
-    public static array $configRetry = [];
+    public static array $keepProxys = [];
     public static float $timeTotal = 0.00;
 
 
@@ -124,6 +124,7 @@ class SexyHttps
     */
     private static function ProxyChecker( array $serverProxyInfo ) : bool 
     {
+        self::$keepProxys = $serverProxyInfo;
         self::VerifyConstValueArray( $serverProxyInfo );
         if (isset( $serverProxyInfo )) {
             $ch = curl_init( "https://www.google.com/" );
@@ -235,13 +236,7 @@ class SexyHttps
         bool $cookie = true 
     ) : SexyHttps
     {
-        self::ModifyUrl( $url );
-        !$cookie ?: self::UsedCookie( $url );
-        empty( $serverProxy ) ?: self::UsedProxys( $serverProxy );
-        self::LoadHeader( $header );
-        
-        self::LoadMethod( "GET" );
-        return new self( );
+        return self::MethodForPoly( $url, $postField, "GET", $header, $serverProxy, $cookie );
     }
 
 
@@ -258,13 +253,7 @@ class SexyHttps
         bool $cookie = true 
     ) : SexyHttps
     {
-        self::ModifyUrl( $url );
-        !$cookie ?: self::UsedCookie( $url );
-        empty( $serverProxy ) ?: self::UsedProxys( $serverProxy );
-        self::LoadHeader( $header );
-        
-        self::LoadMethod( "post", $postField );
-        return new self( );
+        return self::MethodForPoly( $url, $postField, "POST", $header, $serverProxy, $cookie );
     }
 
 
@@ -274,6 +263,24 @@ class SexyHttps
     *@return SexyHttps
     */
     public static function Custom( 
+        string $url, 
+        string $postField = "",
+        string $method,
+        array $header = [], 
+        array $serverProxy = [], 
+        bool $cookie = true 
+    ) : SexyHttps
+    {
+        return self::MethodForPoly( $url, $postField, $method, $header, $serverProxy, $cookie );
+    }
+
+
+    /**
+    method used for "polimorfismo" in methods GET, CUSTOM and Post
+    *@access public
+    *@return SexyHttps
+    */
+    private static function MethodForPoly(        
         string $url, 
         string $postField = "",
         string $method,
@@ -300,7 +307,7 @@ class SexyHttps
     */
     public static function Run( 
         string $msgExecute = "",
-         string $searchCoin = "", 
+         string $searchCoin = "empty", 
          bool $retry = false 
     ) : object | bool
     {
@@ -313,6 +320,7 @@ class SexyHttps
         curl_exec( self::$objectCurl );
 
         self::ParseCookie( $resp );
+        self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
         curl_close( self::$objectCurl );
         return (object) [ "result" => $resp, "jsonArray" => self::JsonParse( $resp ) ];
     }
@@ -326,10 +334,11 @@ class SexyHttps
     {
         $countRetrys = 0;
         do {
+            empty( self::$keepProxys ) ?: self::UsedProxys( self::$keepProxys );
             $resp = curl_exec( self::$objectCurl );
             $countRetrys++;
         } while (
-            (stristr( $resp, $searchCoin ) and $msgExecute == $resp) and
+            (stristr( $resp, $searchCoin ) || $msgExecute == $resp) and
             $countRetrys <= 7
         );
 
