@@ -236,7 +236,7 @@ class SexyHttps
         bool $cookie = true 
     ) : SexyHttps
     {
-        return self::MethodForPoly( $url, $postField, "GET", $header, $serverProxy, $cookie );
+        return self::MethodForPoly( $url, "", "GET", $header, $serverProxy, $cookie );
     }
 
 
