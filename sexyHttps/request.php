@@ -371,7 +371,7 @@ class SexyHttps
     */
     public static function JsonParse( string $string ) : array 
     {
-        preg_match_all( "#\\{[\w\"\\[:\\,\\] ]{6,}\\}#", $string, $matchCoin );
+        preg_match_all( "#\\{[\S ]{6,}\\}#", $string, $matchCoin );
         $jsonArray = [];
         foreach ($matchCoin[0] as $jsonCoin) {
             $jsonValue = json_decode( $jsonCoin, true );
