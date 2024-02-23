@@ -33,7 +33,6 @@ class SexyHttps
     private static string $url;
     public static array $keepProxys = [];
     public static float $timeTotal = 0.00;
-    public static int $retrysCount = 0;
 
 
     /**
@@ -345,7 +344,6 @@ class SexyHttps
         if ($countRetrys > 7) {
             throw new exception("retry exceeded! ( 7 )");
         }
-        self::$retrysCount += $countRetrys - 1;
         return $resp;
     }
 
