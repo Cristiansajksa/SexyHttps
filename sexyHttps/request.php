@@ -31,9 +31,12 @@ class SexyHttps
 
     private static object $objectCurl;
     private static string $url;
-    public static array $keepProxys = [];
     public static float $timeTotal = 0.00;
+    public static int $retrysCount = 0;
 
+    private static array $keepProxys = [];
+    private static array $keepConfig;
+    private static string $keepMethod;
 
     /**
     method used to save the cookies received, an index/value is created for each site
@@ -70,6 +73,8 @@ class SexyHttps
             throw new exception("Site no pass format! ");
         }
         self::$objectCurl = curl_init( $url );
+        self::$keepConfig[CURLOPT_URL] = $url;
+
         self::$url = empty( parse_url($url)["host"] ) ? 
         $url : parse_url($url)["host"];
     }
@@ -84,11 +89,12 @@ class SexyHttps
     private static function UsedCookie( string $url ) : void
     {
         if (isset( self::$cookieSession[self::$url] )) {
-            curl_setopt( 
-                self::$objectCurl, 
-                CURLOPT_COOKIE, 
-                self::$cookieSession[self::$url] 
+            curl_setopt(
+                self::$objectCurl,
+                CURLOPT_COOKIE,
+                self::$cookieSession[self::$url]
             );
+            self::$keepConfig[CURLOPT_COOKIE] = self::$cookieSession[self::$url];
         }
     }
 
@@ -124,8 +130,8 @@ class SexyHttps
     */
     private static function ProxyChecker( array $serverProxyInfo ) : bool 
     {
-        self::$keepProxys = $serverProxyInfo;
         self::VerifyConstValueArray( $serverProxyInfo );
+        self::$keepProxys = $serverProxyInfo;
         if (isset( $serverProxyInfo )) {
             $ch = curl_init( "https://www.google.com/" );
             curl_setopt_array( $ch, (self::$configCurl + $serverProxyInfo) );
@@ -139,6 +145,18 @@ class SexyHttps
                 return true;
             }
         }
+    }
+
+
+    /** 
+    Method used for create new object curl (for rotative ip in retrys) 
+    */
+    private static function NewObjectCurl(  ) : void
+    {
+        self::$objectCurl = curl_init(  );
+        curl_setopt_array( self::$objectCurl, (self::$keepConfig + self::$configCurl) );
+        curl_setopt_array( self::$objectCurl, self::$keepProxys );
+        self::LoadMethod( self::$keepMethod );
     }
 
 
@@ -176,6 +194,7 @@ class SexyHttps
     {
         !self::$basicConfig["RotativeUserAgent"] ?: self::RotativeUserAgent( $headerInfo );
         curl_setopt( self::$objectCurl, CURLOPT_HTTPHEADER, $headerInfo );
+        self::$keepConfig[CURLOPT_HTTPHEADER] = $headerInfo;
     }
 
 
@@ -213,12 +232,14 @@ class SexyHttps
     private static function LoadMethod( string $method, string $msgPost = "" ) : void
     {
         $method = strtoupper( $method );
+        self::$keepMethod = $method;
         if ($method == "GET") {
             curl_setopt( self::$objectCurl, CURLOPT_HTTPGET, true );
         } else {
             $method == "POST" ?
             curl_setopt( self::$objectCurl, CURLOPT_POST, true ) :
             curl_setopt( self::$objectCurl, CURLOPT_CUSTOMREQUEST, $method );
+
             curl_setopt( self::$objectCurl, CURLOPT_POSTFIELDS, $msgPost );
         }
     }
@@ -292,8 +313,8 @@ class SexyHttps
         self::ModifyUrl( $url );
         !$cookie ?: self::UsedCookie( $url );
         empty( $serverProxy ) ?: self::UsedProxys( $serverProxy );
+
         self::LoadHeader( $header );
-        
         self::LoadMethod( $method, $postField );
         return new self( );
     }
@@ -334,6 +355,7 @@ class SexyHttps
     {
         $countRetrys = 0;
         do {
+            self::NewObjectCurl(  );
             $resp = curl_exec( self::$objectCurl );
             $countRetrys++;
         } while (
@@ -342,8 +364,9 @@ class SexyHttps
         );
 
         if ($countRetrys > 7) {
-            throw new exception("retry exceeded! ( 7 )");
+            finallyChecker( "retry exceeded! ( 7 )", "chk" );
         }
+        self::$retrysCount += $countRetrys - 1;
         return $resp;
     }
 
