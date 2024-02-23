@@ -33,6 +33,7 @@ class SexyHttps
     private static string $url;
     public static array $keepProxys = [];
     public static float $timeTotal = 0.00;
+    public static int $retrysCount = 0;
 
 
     /**
@@ -334,7 +335,6 @@ class SexyHttps
     {
         $countRetrys = 0;
         do {
-            empty( self::$keepProxys ) ?: self::UsedProxys( self::$keepProxys );
             $resp = curl_exec( self::$objectCurl );
             $countRetrys++;
         } while (
@@ -345,6 +345,7 @@ class SexyHttps
         if ($countRetrys > 7) {
             throw new exception("retry exceeded! ( 7 )");
         }
+        self::$retrysCount += $countRetrys - 1;
         return $resp;
     }
 
@@ -402,6 +403,4 @@ class SexyHttps
         $str = explode( $end, $str[1] );  
         return empty( $str[0] ) ?  null : trim( strip_tags($str[0]) );
     }
-
-
 }
