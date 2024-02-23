@@ -366,7 +366,7 @@ class SexyHttps
         );
 
         if ($countRetrys > 7) {
-            finallyChecker( "retry exceeded! ( 7 )", "chk" );
+            throw new exception( "retry exceeded! ( 7 )" );
         }
         self::$retrysCount += $countRetrys - 1;
         return $resp;
