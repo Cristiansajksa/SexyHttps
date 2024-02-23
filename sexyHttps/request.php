@@ -19,7 +19,9 @@ class SexyHttps
     public static array $basicConfig = 
     [
         "RotativeUserAgent" => true,
+        "NewCurlRetry" => true
     ];
+
     public static array $configCurl = 
     [
         CURLOPT_RETURNTRANSFER => true,
@@ -355,7 +357,7 @@ class SexyHttps
     {
         $countRetrys = 0;
         do {
-            self::NewObjectCurl(  );
+            !$basicConfig["NewCurlRetry"] ?: self::NewObjectCurl(  );
             $resp = curl_exec( self::$objectCurl );
             $countRetrys++;
         } while (
