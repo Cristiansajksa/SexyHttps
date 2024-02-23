@@ -357,7 +357,7 @@ class SexyHttps
     {
         $countRetrys = 0;
         do {
-            !$basicConfig["NewCurlRetry"] ?: self::NewObjectCurl(  );
+            !self::$basicConfig["NewCurlRetry"] ?: self::NewObjectCurl(  );
             $resp = curl_exec( self::$objectCurl );
             $countRetrys++;
         } while (
