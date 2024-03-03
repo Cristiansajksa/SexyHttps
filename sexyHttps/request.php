@@ -38,7 +38,7 @@ class SexyHttps
 
     private static array $keepProxys = [];
     private static array $keepConfig;
-    private static string $keepMethod;
+    private static ?string $keepMethod, $keepMsgPost;
 
     /**
     method used to save the cookies received, an index/value is created for each site
@@ -47,17 +47,36 @@ class SexyHttps
     *@access private
     *@return bool
     */
-    private static function ParseCookie( string $resultHttp ) : bool
+    private static function ParseCookie( string $resultHttp ) : void
     {
         if ( 
-            empty(preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie))
+            !empty(preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie))
         ) {
-            return false;
-        } else {
             $cookie = join( " ", $matchCookie[0] );
-            self::$cookieSession[self::$url] = $cookie;
-            return true;
+            self::$cookieSession[self::$url] = empty( self::$cookieSession[self::$url] ) ?
+            $cookie : self::verifyAtributesCookie( $matchCookie[0] );
         }
+    }
+
+
+    private static function VerifyAtributesCookie( array $attributesCookie ) : string
+    {
+        parse_str( join("&", $attributesCookie), $keepAttCookie );
+        $cookieCopy = self::$cookieSession[self::$url];
+        foreach ($keepAttCookie as $attCookie => $valueCookie) {
+            if (strstr( $cookieCopy, $attCookie )) {
+
+                $cookieReference = preg_replace( 
+                    "#(?<=$attCookie=)\S+#", 
+                    $valueCookie, 
+                    $cookieCopy, 
+                    1 
+                );
+                continue;
+            }
+            $cookieCopy .= " $attCookie=$valueCookie ";
+        }
+        return $cookieCopy;      
     }
 
 
@@ -158,7 +177,7 @@ class SexyHttps
         self::$objectCurl = curl_init(  );
         curl_setopt_array( self::$objectCurl, (self::$keepConfig + self::$configCurl) );
         curl_setopt_array( self::$objectCurl, self::$keepProxys );
-        self::LoadMethod( self::$keepMethod );
+        self::LoadMethod( self::$keepMethod, self::$keepMsgPost );
     }
 
 
@@ -209,7 +228,7 @@ class SexyHttps
     private static function RotativeUserAgent( array &$headerInfo ) : null
     {
         $userAgentList = json_decode( 
-            file_get_contents(__DIR__ . "/UserAgent.json"), 
+            file_get_contents( __DIR__ . "\UserAgent.json" ), 
             true 
         )["UserAgent"];    
         foreach ($headerInfo as &$header) {
@@ -235,6 +254,8 @@ class SexyHttps
     {
         $method = strtoupper( $method );
         self::$keepMethod = $method;
+        self::$keepMsgPost = $msgPost;
+
         if ($method == "GET") {
             curl_setopt( self::$objectCurl, CURLOPT_HTTPGET, true );
         } else {
