@@ -59,6 +59,13 @@ class SexyHttps
     }
 
 
+    /**
+    method used when you already have a session cookie and the site returns values ​​for the cookie again, 
+    add the ones that are not there and overwrite what is already there
+    *@param array $attributesCookie
+    *@return string
+    *@access private
+    */
     private static function VerifyAtributesCookie( array $attributesCookie ) : string
     {
         parse_str( join("&", $attributesCookie), $keepAttCookie );
