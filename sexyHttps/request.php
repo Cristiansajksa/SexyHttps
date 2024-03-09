@@ -47,10 +47,10 @@ class SexyHttps
     *@access private
     *@return bool
     */
-    private static function ParseCookie( string $resultHttp ) : void
+    private static function ParseCookie(string $resultHttp) : void
     {
         if ( 
-            !empty(preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie))
+            !empty( preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie) )
         ) {
             $cookie = join( " ", $matchCookie[0] );
             self::$cookieSession[self::$url] = empty( self::$cookieSession[self::$url] ) ?
@@ -59,14 +59,7 @@ class SexyHttps
     }
 
 
-    /**
-    method used when you already have a session cookie and the site returns values ​​for the cookie again, 
-    add the ones that are not there and overwrite what is already there
-    *@param array $attributesCookie
-    *@return string
-    *@access private
-    */
-    private static function VerifyAtributesCookie( array $attributesCookie ) : string
+    private static function VerifyAtributesCookie(array $attributesCookie) : string
     {
         parse_str( join("&", $attributesCookie), $keepAttCookie );
         $cookieCopy = self::$cookieSession[self::$url];
@@ -95,7 +88,7 @@ class SexyHttps
     *@return void
     *@param string $url
     */
-    private static function ModifyUrl( string $url ) : void 
+    private static function ModifyUrl(string $url) : void 
     {
         if (empty( parse_url($url)["host"] )) {
             throw new exception("Site no pass format! ");
@@ -114,7 +107,7 @@ class SexyHttps
     *@return void
     *@access private
     */
-    private static function UsedCookie( string $url ) : void
+    private static function UsedCookie(string $url) : void
     {
         if (isset( self::$cookieSession[self::$url] )) {
             curl_setopt(
@@ -133,7 +126,7 @@ class SexyHttps
     *@return void
     *@access private
     */
-    private static function VerifyConstValueArray( array &$arrayInfo ) : void
+    private static function VerifyConstValueArray(array &$arrayInfo) : void
     {
         foreach ($arrayInfo as $key => $value) {
             unset( $arrayInfo[$key] );
@@ -156,11 +149,12 @@ class SexyHttps
     *@return bool
     *@access private
     */
-    private static function ProxyChecker( array $serverProxyInfo ) : bool 
+    private static function ProxyChecker(array $serverProxyInfo) : bool 
     {
         self::VerifyConstValueArray( $serverProxyInfo );
         self::$keepProxys = $serverProxyInfo;
         if (isset( $serverProxyInfo )) {
+
             $ch = curl_init( "https://www.google.com/" );
             curl_setopt_array( $ch, (self::$configCurl + $serverProxyInfo) );
             $resultCurl = curl_exec( $ch );
@@ -179,7 +173,7 @@ class SexyHttps
     /** 
     Method used for create new object curl (for rotative ip in retrys) 
     */
-    private static function NewObjectCurl(  ) : void
+    private static function NewObjectCurl() : void
     {
         self::$objectCurl = curl_init(  );
         curl_setopt_array( self::$objectCurl, (self::$keepConfig + self::$configCurl) );
@@ -196,7 +190,7 @@ class SexyHttps
     *@return true
     *@param array $serverProxyInfo
     */
-    private static function UsedProxys( array $serverProxyInfo ) : true
+    private static function UsedProxys(array $serverProxyInfo) : true
     {
         for (
             $countProxyCheck = 0; 
@@ -218,7 +212,7 @@ class SexyHttps
     *@return void
     *@param array $headerInfo
     */
-    private static function LoadHeader( array $headerInfo ) : void
+    private static function LoadHeader(array $headerInfo) : void
     {
         !self::$basicConfig["RotativeUserAgent"] ?: self::RotativeUserAgent( $headerInfo );
         curl_setopt( self::$objectCurl, CURLOPT_HTTPHEADER, $headerInfo );
@@ -232,12 +226,12 @@ class SexyHttps
     *@return null
     *@param array $headerInfo
     */
-    private static function RotativeUserAgent( array &$headerInfo ) : null
+    private static function RotativeUserAgent(array &$headerInfo) : null
     {
         $userAgentList = json_decode( 
-            file_get_contents( __DIR__ . "\UserAgent.json" ), 
+            file_get_contents( __DIR__ . "\useragents.json" ), 
             true 
-        )["UserAgent"];    
+        )["UserAgent"];
         foreach ($headerInfo as &$header) {
 
             if (stristr( $header, "user-agent" )) {
@@ -257,7 +251,7 @@ class SexyHttps
     *@param string $method
     *@param string msgPost = ""
     */
-    private static function LoadMethod( string $method, string $msgPost = "" ) : void
+    private static function LoadMethod(string $method, string $msgPost = "") : void
     {
         $method = strtoupper( $method );
         self::$keepMethod = $method;
@@ -358,7 +352,7 @@ class SexyHttps
     */
     public static function Run( 
         string $msgExecute = "",
-         string $searchCoin = "empty", 
+         string $searchCoin = "isset", 
          bool $retry = false 
     ) : object | bool
     {
@@ -421,7 +415,7 @@ class SexyHttps
     *@return array
     *@access public
     */
-    public static function JsonParse( string $string ) : array 
+    public static function JsonParse(string $string) : array 
     {
         preg_match_all( "#\\{[\S ]{6,}\\}#", $string, $matchCoin );
         $jsonArray = [];
