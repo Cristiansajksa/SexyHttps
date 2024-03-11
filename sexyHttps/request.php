@@ -22,6 +22,7 @@ class SexyHttps
         "NewCurlRetry" => true
     ];
 
+
     public static array $configCurl = 
     [
         CURLOPT_RETURNTRANSFER => true,
@@ -31,14 +32,17 @@ class SexyHttps
         CURLOPT_HEADER => true
     ];
 
+
     private static object $objectCurl;
     private static string $url;
     public static float $timeTotal = 0.00;
     public static int $retrysCount = 0;
 
+
     private static array $keepProxys = [];
     private static array $keepConfig;
     private static ?string $keepMethod, $keepMsgPost;
+
 
     /**
     method used to save the cookies received, an index/value is created for each site
@@ -72,9 +76,10 @@ class SexyHttps
                     $cookieCopy, 
                     1 
                 );
-                continue;
+
+            } else {
+                $cookieCopy .= " $attCookie=$valueCookie ";
             }
-            $cookieCopy .= " $attCookie=$valueCookie ";
         }
         return $cookieCopy;      
     }
@@ -115,6 +120,7 @@ class SexyHttps
                 CURLOPT_COOKIE,
                 self::$cookieSession[self::$url]
             );
+
             self::$keepConfig[CURLOPT_COOKIE] = self::$cookieSession[self::$url];
         }
     }
@@ -133,8 +139,9 @@ class SexyHttps
             if (!defined( $key )) {
                 continue;
             }
+
             $value = is_file( $value ) ?
-            file( $value, FILE_IGNORE_NEW_LINES )[array_rand( file($value, FILE_IGNORE_NEW_LINES) )] :
+            file( $value, FILE_IGNORE_NEW_LINES )[array_rand(file($value, FILE_IGNORE_NEW_LINES))] :
             $value;
 
             $arrayInfo[constant($key)] = $value;
@@ -154,12 +161,13 @@ class SexyHttps
         self::VerifyConstValueArray( $serverProxyInfo );
         self::$keepProxys = $serverProxyInfo;
         if (isset( $serverProxyInfo )) {
-
             $ch = curl_init( "https://www.google.com/" );
             curl_setopt_array( $ch, (self::$configCurl + $serverProxyInfo) );
+
             $resultCurl = curl_exec( $ch );
             curl_close( $ch );
 
+            
             if (empty( $resultCurl )) {
                 return false;
             } else {
@@ -229,11 +237,12 @@ class SexyHttps
     private static function RotativeUserAgent(array &$headerInfo) : null
     {
         $userAgentList = json_decode( 
-            file_get_contents( __DIR__ . "\useragents.json" ), 
+            file_get_contents( __DIR__ . "\UserAgents.json" ), 
             true 
         )["UserAgent"];
-        foreach ($headerInfo as &$header) {
 
+
+        foreach ($headerInfo as &$header) {
             if (stristr( $header, "user-agent" )) {
                 $header = "User-Agent: " . $userAgentList[array_rand($userAgentList)];
                 return null; 
@@ -256,6 +265,7 @@ class SexyHttps
         $method = strtoupper( $method );
         self::$keepMethod = $method;
         self::$keepMsgPost = $msgPost;
+
 
         if ($method == "GET") {
             curl_setopt( self::$objectCurl, CURLOPT_HTTPGET, true );
@@ -338,6 +348,7 @@ class SexyHttps
         !$cookie ?: self::UsedCookie( $url );
         empty( $serverProxy ) ?: self::UsedProxys( $serverProxy );
 
+        
         self::LoadHeader( $header );
         self::LoadMethod( $method, $postField );
         return new self( );
@@ -359,6 +370,7 @@ class SexyHttps
         if (empty( self::$objectCurl )) {
             return false;
         }
+        
         curl_setopt_array( self::$objectCurl, self::$configCurl );
         $resp = $retry ?  
         self::executeRetrys( $msgExecute, $searchCoin ) : 
