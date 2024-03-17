@@ -28,7 +28,7 @@ class SexyHttps
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_TIMEOUT => 16,
+        CURLOPT_TIMEOUT => 60,
         CURLOPT_HEADER => true
     ];
 
@@ -65,12 +65,16 @@ class SexyHttps
 
     private static function VerifyAtributesCookie(array $attributesCookie) : string
     {
-        parse_str( join("&", $attributesCookie), $keepAttCookie );
+        $cookieUrlFormat = str_replace( ["[", "]"], ["tF!SDG", "tF!SDD"], join("&", $attributesCookie) );
+        parse_str( $cookieUrlFormat, $keepAttCookie );
         $cookieCopy = self::$cookieSession[self::$url];
+
+
         foreach ($keepAttCookie as $attCookie => $valueCookie) {
+            $attCookie = str_replace( ["tF!SDG", "tF!SDD"], ["[", "]"], $attCookie );
             if (strstr( $cookieCopy, $attCookie )) {
 
-                $cookieReference = preg_replace( 
+                $cookieCopy = preg_replace( 
                     "#(?<=$attCookie=)\S+#", 
                     $valueCookie, 
                     $cookieCopy, 
@@ -100,9 +104,7 @@ class SexyHttps
         }
         self::$objectCurl = curl_init( $url );
         self::$keepConfig[CURLOPT_URL] = $url;
-
-        self::$url = empty( parse_url($url)["host"] ) ? 
-        $url : parse_url($url)["host"];
+        self::$url = parse_url( $url )["host"] ?? $url;
     }
 
 
@@ -161,14 +163,15 @@ class SexyHttps
         self::VerifyConstValueArray( $serverProxyInfo );
         self::$keepProxys = $serverProxyInfo;
         if (isset( $serverProxyInfo )) {
-            $ch = curl_init( "https://www.google.com/" );
-            curl_setopt_array( $ch, (self::$configCurl + $serverProxyInfo) );
+            $ch = curl_init( "http://ip-api.com/json" );
+            curl_setopt_array( $ch, $serverProxyInfo );
 
-            $resultCurl = curl_exec( $ch );
+            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+            $resultCurl = json_decode( curl_exec($ch) );
             curl_close( $ch );
 
             
-            if (empty( $resultCurl )) {
+            if (empty( $resultCurl->query )) {
                 return false;
             } else {
                 curl_setopt_array( self::$objectCurl, $serverProxyInfo );
