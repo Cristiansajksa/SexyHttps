@@ -374,6 +374,7 @@ class SexyHttps
             return false;
         }
         
+        
         curl_setopt_array( self::$objectCurl, self::$configCurl );
         $resp = $retry ?  
         self::executeRetrys( $msgExecute, $searchCoin ) : 
