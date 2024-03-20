@@ -1,4 +1,4 @@
-# SexyHttps
+# SexyHttps-Php
 
 This Project is based and inspired by [CurlX](https://github.com/devblack/curlx)
 
