@@ -36,7 +36,7 @@ trait TraitCookieRequest
 
                 $cookieCopy = preg_replace( 
                     "#(?<=$attCookie=)\S+#", 
-                    str_replace("=", "%3D", $valueCookie),  
+                    $valueCookie,  
                     $cookieCopy, 
                     1 
                 );
