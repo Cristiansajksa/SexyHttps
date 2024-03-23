@@ -13,6 +13,9 @@ Nomanclatura:
 CamelCase: Variables (class and no class), callables
 StudyCase: Method and Class
 */
+require __DIR__ . "autoload.php";
+
+    
 class SexyHttps 
 {
     public static array $cookieSession = [];
