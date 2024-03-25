@@ -14,7 +14,7 @@ class OthorRequest
 
 
 
-    public static function NewObjectCurl() : void
+    public function NewObjectCurl() : void
     {
         sexyHttps::$objectCurl = curl_init(  );
         curl_setopt_array( sexyHttps::$objectCurl, (sexyHttps::$keepConfig + sexyHttps::$configCurl) );

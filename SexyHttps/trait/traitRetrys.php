@@ -32,7 +32,7 @@ trait TraitRetrysRequest
     {
         $countRetrys = 0;
         do {
-            !sexyHttps::$basicConfig["NewCurlRetry"] ?: OthorRequest::NewObjectCurl(  );
+            !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl(  );
             $resp = curl_exec( sexyHttps::$objectCurl );
 
             $countRetrys++;
