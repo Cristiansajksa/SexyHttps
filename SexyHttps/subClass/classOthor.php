@@ -19,12 +19,12 @@ class OthorRequest
         sexyHttps::$objectCurl = curl_init(  );
         curl_setopt_array( sexyHttps::$objectCurl, (sexyHttps::$keepConfig + sexyHttps::$configCurl) );
         curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$keepProxys );
-        sexyHttps::LoadMethod( sexyHttps::$keepMethod, sexyHttps::$keepMsgPost );
+        self::LoadMethod( sexyHttps::$keepMethod, sexyHttps::$keepMsgPost );
     }
 
 
 
-    public function LoadHeader(array $headerInfo) : void
+    public static function LoadHeader(array $headerInfo) : void
     {
         !sexyHttps::$basicConfig["RotativeUserAgent"] ?: self::RotativeUserAgent( $headerInfo );
         curl_setopt( sexyHttps::$objectCurl, CURLOPT_HTTPHEADER, $headerInfo );
@@ -33,7 +33,7 @@ class OthorRequest
 
 
 
-    public function LoadMethod(string $method, string $msgPost = "") : void
+    public static function LoadMethod(string $method, string $msgPost = "") : void
     {
         $method = strtoupper( $method );
         sexyHttps::$keepMethod = $method;
