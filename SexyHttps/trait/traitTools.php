@@ -27,7 +27,7 @@ trait TraitToolsRequest
 
     public function AddConfig(array $configExtraCurl) : void
     {
-        self::VerifyConstValueArray( $configExtraCurl );
+        self::$objectProxys->VerifyConstValueArray( $configExtraCurl );
         curl_setopt_array( self::$objectCurl, $configExtraCurl );
     }
 }
