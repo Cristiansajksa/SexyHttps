@@ -41,7 +41,7 @@ class ProxysRequest
 
 
 
-    private static function VerifyConstValueArray(array &$arrayInfo) : void
+    public static function VerifyConstValueArray(array &$arrayInfo) : void
     {
         foreach ($arrayInfo as $key => $value) {
             unset( $arrayInfo[$key] );
