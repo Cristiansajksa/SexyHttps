@@ -1,21 +1,21 @@
 <?php
 function AutoLoad($dirForAutoLoad = __DIR__, $extesion = "php") {
-    $recursion = function() use (&$recursion, $dirForAutoLoad, $extesion) {
+    $recursion = function(string $dirForAutoLoad) use (&$recursion, $extesion) {
         foreach (scandir( $dirForAutoLoad ) as $fileName) {
-            if (substr( $fileName, 0, 1 ) == ".")
+            if ($fileName[0] == ".")
                 continue;
 
             if (
                 fnmatch( "*.$extesion", $fileName )  and
-                empty( preg_grep("#$fileName#", get_required_files()) )
+                !stristr( __FILE__, $fileName )
             ) {
                 require $dirForAutoLoad . "/$fileName";
-            } elseif (is_dir( $fileName )) {
+            } elseif (is_dir( $dirForAutoLoad . "/$fileName" )) {
                 $recursion( $dirForAutoLoad . "/$fileName" );
             }
         }
     };
 
 
-    $recursion();
+    $recursion($dirForAutoLoad);
 }
