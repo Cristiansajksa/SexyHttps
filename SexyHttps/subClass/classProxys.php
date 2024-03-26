@@ -17,7 +17,7 @@ class ProxysRequest
 
 
     
-    private function ProxyChecker(array $serverProxyInfo) : bool 
+    private static function ProxyChecker(array $serverProxyInfo) : bool 
     {
         self::VerifyConstValueArray( $serverProxyInfo );
         sexyHttps::$keepProxys = $serverProxyInfo;
