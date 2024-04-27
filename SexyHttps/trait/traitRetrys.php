@@ -68,14 +68,14 @@ trait TraitRetrysRequest
     ) : string
     {
         $countRetrys = 0;
-        do {
+
+        while (
+            (stristr($resp, $searchCoin) || $msgExecute == $resp) and $countRetrys <= 7
+        ) {
             $resp = curl_exec( sexyHttps::$objectCurl );
             !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
             $countRetrys++;
-        } while (
-            (stristr($resp, $searchCoin) || $msgExecute == $resp) and
-            $countRetrys <= 7
-        );
+        } 
 
         self::checkResult( $countRetrys );
         return $resp;
