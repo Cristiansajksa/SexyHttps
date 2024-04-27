@@ -42,7 +42,7 @@ trait TraitRetrysRequest
 
     
     private static function retrysArray(
-        ?string $msgExecute, ?string $searchCoin 
+        ?string $msgExecute, array $searchCoin 
     ) : string
     {
         for ($countRetrys = 0; $countRetrys <= 7; $countRetrys) {
@@ -53,8 +53,8 @@ trait TraitRetrysRequest
                 if (stristr($resp, $coinsString) || $resp == $msgExecute) {
                     break;
                 }
-                break 2;
             }
+            break;
         }
 
         self::checkResult( $countRetrys );
@@ -64,7 +64,7 @@ trait TraitRetrysRequest
 
     
     private static function retrysString( 
-        ?string $msgExecute, ?string $searchCoin 
+        ?string $msgExecute, string $searchCoin 
     ) : string
     {
         $countRetrys = 0;
