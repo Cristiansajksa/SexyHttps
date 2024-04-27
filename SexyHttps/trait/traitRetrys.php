@@ -15,7 +15,7 @@ trait TraitRetrysRequest
         curl_exec( sexyHttps::$objectCurl );
 
         self::$objectCookie->ParseCookie( $resp );
-        sexyHttps::$timeTotal += curl_getinfo( sexyHttps::$objectCurl )["total_time"];
+        self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
         curl_close( sexyHttps::$objectCurl );
         return (object) [ "result" => $resp, "jsonArray" => self::JsonParse($resp) ];
     }
@@ -36,7 +36,7 @@ trait TraitRetrysRequest
         if ($countRetrys > 7) {
             throw new exception( "retry exceeded! (7)" );
         }
-        sexyHttps::$retrysCount += $countRetrys - 1;
+        sexyHttps::$retrysCount += $countRetrys;
     }
 
 
@@ -68,15 +68,15 @@ trait TraitRetrysRequest
     ) : string
     {
         $countRetrys = 0;
-
-        while (
-            (stristr($resp, $searchCoin) || $msgExecute == $resp) and $countRetrys <= 7
-        ) {
+        do {
             $resp = curl_exec( sexyHttps::$objectCurl );
             !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
             $countRetrys++;
-        } 
+        } while (
+            (stristr($resp, $searchCoin) || $msgExecute == $resp) and $countRetrys <= 7
+        ); 
 
+        $countRetrys--;
         self::checkResult( $countRetrys );
         return $resp;
     }
