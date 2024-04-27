@@ -11,25 +11,19 @@ trait TraitMethodsRequest
     ) : SexyHttps
     {
         self::builder();
-
-        
         self::$objectOthor->ModifyUrl( $url );
         !$cookie ?: self::$objectCookie->UsedCookie( $url );
         empty( $serverProxy ) ?: self::$objectProxys->UsedProxys( $serverProxy );
 
-        
         self::$objectOthor->LoadHeader( $header );
         self::$objectOthor->LoadMethod( $method, $postField );
-        return new self( );
+        return new self();
     }
 
 
 
     public static function Get( 
-        string $url, 
-        array $header = [], 
-        array $serverProxy = [], 
-        bool $cookie = true 
+        string $url, array $header = [], array $serverProxy = [], bool $cookie = true 
     ) : SexyHttps
     {
         return self::MethodForPoly( $url, "", "GET", $header, $serverProxy, $cookie );
