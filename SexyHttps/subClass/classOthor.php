@@ -17,7 +17,7 @@ class OthorRequest
     public function NewObjectCurl() : void
     {
         sexyHttps::$objectCurl = curl_init();
-        sexyHttps::LoadHeader( sexyHttps::$keepHeader );
+        self::LoadHeader( sexyHttps::$keepHeader );
         curl_setopt_array( sexyHttps::$objectCurl, (sexyHttps::$keepConfig + sexyHttps::$configCurl) );
         curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$keepProxys );
         
