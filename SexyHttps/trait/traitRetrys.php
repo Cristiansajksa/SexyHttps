@@ -45,15 +45,18 @@ trait TraitRetrysRequest
         ?string $msgExecute, array $searchCoin 
     ) : string
     {
-        for ($countRetrys = 0; $countRetrys <= 7; $countRetrys) {
+        $countRetrys = 0;
+        while ($countRetrys <= 7) {
             $resp = curl_exec( sexyHttps::$objectCurl );
             !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
 
             foreach ($searchCoin as $coinsString) {
                 if (stristr($resp, $coinsString) || $resp == $msgExecute) {
-                    break;
+                    $countRetrys++;
+                    continue 2;
                 }
             }
+
             break;
         }
 
