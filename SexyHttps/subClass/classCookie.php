@@ -3,7 +3,7 @@ class CookieRequest
 {
     public function ParseCookie(string $resultHttp) : void
     {
-        if (empty(preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie))) {
+        if (preg_match_all("#(?<=set-cookie: )\S{3,}(?= )#i", $resultHttp, $matchCookie)) {
             $cookie = join( " ", $matchCookie[0] );
             sexyHttps::$cookieSession[sexyHttps::$url] = empty( sexyHttps::$cookieSession[sexyHttps::$url] ) ?
             $cookie : self::verifyAtributesCookie( $matchCookie[0] );
