@@ -2,7 +2,7 @@
 trait TraitRetrysRequest
 {
     public static function Run( 
-        string $msgExecute = "", string|array $searchCoin = "isset", bool $retry = false 
+        string $msgExecute = "", string|array $searchCoin = "isdsadasdsadasdset", bool $retry = false 
     ) : object | bool
     {
         if (empty(sexyHttps::$objectCurl)) {
@@ -11,8 +11,8 @@ trait TraitRetrysRequest
         curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$configCurl );
         
         $resp = $retry ?  
-        self::executeRetrys( $msgExecute, $searchCoin ) : 
-        curl_exec( sexyHttps::$objectCurl );
+        self::executeRetrys($msgExecute, $searchCoin) : 
+        curl_exec(sexyHttps::$objectCurl);
 
         self::$objectCookie->ParseCookie( $resp );
         self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
@@ -24,16 +24,16 @@ trait TraitRetrysRequest
 
     private static function executeRetrys(string $msgExecute, string|array $searchCoin) : string
     {
-        return is_array( $searchCoin ) ? 
-        self::retrysArray( $msgExecute, $searchCoin ) : 
-        self::retrysString( $msgExecute, $searchCoin );
+        return is_array($searchCoin) ? 
+        self::retrysArray($msgExecute, $searchCoin) : 
+        self::retrysString($msgExecute, $searchCoin);
     }
 
 
 
     private static function checkResult(int $countRetrys) : void
     {
-        if ($countRetrys > 7) {
+        if ($countRetrys >= 7) {
             throw new exception( "retry exceeded! (7)" );
         }
         sexyHttps::$retrysCount += $countRetrys;
@@ -59,7 +59,6 @@ trait TraitRetrysRequest
 
             break;
         }
-
         self::checkResult( $countRetrys );
         return $resp;
     }
@@ -71,6 +70,7 @@ trait TraitRetrysRequest
     ) : string
     {
         $countRetrys = 0;
+        
         do {
             !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
             $resp = curl_exec( sexyHttps::$objectCurl );
