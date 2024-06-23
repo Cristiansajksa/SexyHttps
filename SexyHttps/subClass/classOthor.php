@@ -7,8 +7,8 @@ class OthorRequest
             throw new exception("Site no pass format! ");
         }
         sexyHttps::$objectCurl = curl_init( $url );
+
         sexyHttps::$keepConfig[CURLOPT_URL] = $url;
-        
         sexyHttps::$url = parse_url( $url )["host"] ?? $url;
     }
 
@@ -19,8 +19,8 @@ class OthorRequest
         sexyHttps::$objectCurl = curl_init();
         self::LoadHeader( sexyHttps::$keepHeader );
         curl_setopt_array( sexyHttps::$objectCurl, (sexyHttps::$keepConfig + sexyHttps::$configCurl) );
+
         curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$keepProxys );
-        
         self::LoadMethod( sexyHttps::$keepMethod, sexyHttps::$keepMsgPost );
     }
 
@@ -35,7 +35,7 @@ class OthorRequest
 
 
 
-    public static function LoadMethod(string $method, string $msgPost = "") : void
+    public static function LoadMethod(string $method, string|array $msgPost = "") : void
     {
         $method = strtoupper( $method );
         sexyHttps::$keepMethod = $method;
@@ -46,8 +46,8 @@ class OthorRequest
 
         } else {
             $method == "POST" ?
-            curl_setopt( sexyHttps::$objectCurl, CURLOPT_POST, true ) :
-            curl_setopt( sexyHttps::$objectCurl, CURLOPT_CUSTOMREQUEST, $method );
+            curl_setopt(sexyHttps::$objectCurl, CURLOPT_POST, true) :
+            curl_setopt(sexyHttps::$objectCurl, CURLOPT_CUSTOMREQUEST, $method);
 
             curl_setopt( sexyHttps::$objectCurl, CURLOPT_POSTFIELDS, $msgPost );
         }
