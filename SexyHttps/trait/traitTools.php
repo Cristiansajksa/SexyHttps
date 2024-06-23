@@ -2,14 +2,17 @@
 trait TraitToolsRequest
 {
     public static function getStr( 
-        string $msgManege, 
-        string $start,  
-        string $end 
+        string $msgManege, string $start, string $end, bool $format = false
     ) : string | null 
     {
-        $str = explode( $start, $msgManege );
-        $str = explode( $end, $str[1] );  
-        return empty( $str[0] ) ?  null : trim( strip_tags($str[0]) );
+        $partExtract = explode( $start, $msgManege );
+        $partExtract = @explode( $end, $partExtract[1] );  
+        $extractString = $partExtract[0];
+
+        if (empty($extractString)) {
+            return null;
+        }
+        return $format ? urlencode($extractString) : $extractString;
     }
 
 
@@ -18,8 +21,7 @@ trait TraitToolsRequest
     {
         preg_match_all( "#\\{[\S ]{6,}\\}#", $string, $matchCoin );
         return array_filter( 
-            $matchCoin[0], 
-            fn($value) => is_object(json_decode($value))
+            $matchCoin[0], fn($value) => is_object(json_decode($value))
         );
     }
 
