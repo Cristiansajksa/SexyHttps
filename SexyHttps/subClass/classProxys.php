@@ -10,7 +10,7 @@ class ProxysRequest
         );
 
         if ($countProxyCheck === 8) {
-            throw new exception( "Proxys DD" );
+            throw new exception( "An error has occurred in the check-in process" );
         }
         return true;
     }
@@ -21,11 +21,13 @@ class ProxysRequest
     {
         self::VerifyConstValueArray( $serverProxyInfo );
         sexyHttps::$keepProxys = $serverProxyInfo;
+
         if (isset($serverProxyInfo)) {
             $ch = curl_init( "http://ip-api.com/json" );
-
             curl_setopt_array( $ch, $serverProxyInfo );
             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+
+            curl_setopt( $ch, CURLOPT_TIMEOUT, 15 );
             $resultCurl = json_decode( curl_exec($ch) );
             curl_close( $ch );
 
