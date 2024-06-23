@@ -3,7 +3,7 @@ trait TraitMethodsRequest
 {
     private static function MethodForPoly(        
         string $url, 
-        string $postField = "",
+        string|array $postField = "",
         string $method,
         array $header = [], 
         array $serverProxy = [], 
@@ -13,8 +13,8 @@ trait TraitMethodsRequest
         self::builder();
         self::$objectOthor->ModifyUrl( $url );
         !$cookie ?: self::$objectCookie->UsedCookie( $url );
-        empty( $serverProxy ) ?: self::$objectProxys->UsedProxys( $serverProxy );
 
+        empty( $serverProxy ) ?: self::$objectProxys->UsedProxys( $serverProxy );
         self::$objectOthor->LoadHeader( $header );
         self::$objectOthor->LoadMethod( $method, $postField );
         return new self();
@@ -33,7 +33,7 @@ trait TraitMethodsRequest
 
     public static function Post( 
         string $url, 
-        string $postField = "",
+        string|array $postField = "",
         array $header = [], 
         array $serverProxy = [], 
         bool $cookie = true 
@@ -46,7 +46,7 @@ trait TraitMethodsRequest
 
     public static function Custom( 
         string $url, 
-        string $postField = "",
+        string|array $postField = "",
         string $method,
         array $header = [], 
         array $serverProxy = [], 
