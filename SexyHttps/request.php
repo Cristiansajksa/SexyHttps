@@ -14,6 +14,7 @@ class SexyHttps
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => 15,
+        CURLOPT_CONNECTTIMEOUT => 15,
         CURLOPT_HEADER => true,
         CURLOPT_COOKIEJAR => ""
     ];
@@ -27,7 +28,9 @@ class SexyHttps
 
     public static array $keepProxys = [];
     public static array $keepConfig, $keepHeader;
-    public static ?string $keepMethod, $keepMsgPost;
+    public static ?string $keepMethod;
+    public static mixed $keepMsgPost;
+
     private static object $objectCookie, $objectOthor, $objectProxys;
 
 
