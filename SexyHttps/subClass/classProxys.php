@@ -29,7 +29,6 @@ class ProxysRequest
             $resultCurl = json_decode( curl_exec($ch) );
             curl_close( $ch );
 
-            
             if (empty($resultCurl->query)) {
                 return false;
             } else {
@@ -49,9 +48,10 @@ class ProxysRequest
                 continue;
             }
 
-            $value = is_file( $value ) ?
-            file( $value, FILE_IGNORE_NEW_LINES )[array_rand(file($value, FILE_IGNORE_NEW_LINES))] :
+            $value = is_file($value) ?
+            file($value, FILE_IGNORE_NEW_LINES)[array_rand(file($value, FILE_IGNORE_NEW_LINES))] :
             $value;
+            
             $arrayInfo[constant($key)] = $value;
         }
     }
