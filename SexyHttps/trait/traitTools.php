@@ -12,6 +12,7 @@ trait TraitToolsRequest
         if (empty($extractString)) {
             return null;
         }
+        
         return $format ? urlencode($extractString) : $extractString;
     }
 
