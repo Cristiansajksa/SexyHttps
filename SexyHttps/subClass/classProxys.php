@@ -1,7 +1,7 @@
 <?php
 class ProxysRequest
 {
-    public static function UsedProxys(array $serverProxyInfo) : true
+    public static function UsedProxys(array $serverProxyInfo) : void
     {
         for (
             $countProxyCheck = 0; 
@@ -12,7 +12,6 @@ class ProxysRequest
         if ($countProxyCheck === 8) {
             throw new exception( "An error has occurred in the check-in process" );
         }
-        return true;
     }
 
 
@@ -20,7 +19,7 @@ class ProxysRequest
     private static function ProxyChecker(array $serverProxyInfo) : bool 
     {
         self::VerifyConstValueArray( $serverProxyInfo );
-        sexyHttps::$keepProxys = $serverProxyInfo;
+        sexyHttps::$keepConfig += $serverProxyInfo;
 
         if (isset($serverProxyInfo)) {
             $ch = curl_init( "http://ip-api.com/json" );
@@ -50,9 +49,12 @@ class ProxysRequest
                 continue;
             }
 
-            $value = is_file($value) ?
-            file($value, FILE_IGNORE_NEW_LINES)[array_rand(file($value, FILE_IGNORE_NEW_LINES))] :
-            $value;
+            if (is_file($value)) {
+                $keepProxys = file( $value, FILE_IGNORE_NEW_LINES );
+                $value = $keepProxys[array_rand($keepProxys)];
+            } else {
+                $value = $value;
+            }
             
             $arrayInfo[constant($key)] = $value;
         }
