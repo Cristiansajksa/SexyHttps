@@ -15,12 +15,7 @@ class CookieRequest
     public function UsedCookie(string $url) : void
     {
         if (isset(sexyHttps::$cookieSession[sexyHttps::$url])) {
-            curl_setopt(
-                sexyHttps::$objectCurl,
-                CURLOPT_COOKIE,
-                sexyHttps::$cookieSession[sexyHttps::$url]
-            );
-
+            curl_setopt( sexyHttps::$objectCurl, CURLOPT_COOKIE, sexyHttps::$cookieSession[sexyHttps::$url] );
             sexyHttps::$keepConfig[CURLOPT_COOKIE] = sexyHttps::$cookieSession[sexyHttps::$url];
         }
     }
@@ -29,11 +24,12 @@ class CookieRequest
 
     private static function FormatArrayCookie(array $arrayKeepCookie) : array {
         $formatArrayCookie = [];
+
         foreach ($arrayKeepCookie as $attributeCookie) {
             $formatArrayCookie[strstr($attributeCookie, "=", true)] = 
-            str_replace("=", "", strstr($attributeCookie, "=", false));
+            preg_replace( "#=#", "", strstr($attributeCookie, "=", false), 1 );
         }
-    
+        
         return $formatArrayCookie;
     }
 
@@ -43,20 +39,15 @@ class CookieRequest
     {
         $keepAttCookie = self::FormatArrayCookie( $attributesCookie );
         $cookieCopy = sexyHttps::$cookieSession[sexyHttps::$url];
+        
         foreach ($keepAttCookie as $attCookie => $valueCookie) {
-            if (strstr($cookieCopy, $attCookie)) {
-
-                $cookieCopy = preg_replace( 
-                    "#(?<=$attCookie=)\S+#", 
-                    str_replace("=", "%3D", $valueCookie),  
-                    $cookieCopy, 
-                    1 
-                );
-
+            if (str_contains($cookieCopy, $attCookie)) {
+                $cookieCopy = preg_replace( "#(?<=$attCookie=)\S+#", $valueCookie, $cookieCopy, 1 );
             } else {
                 $cookieCopy .= " $attCookie=$valueCookie ";
             }
         }
+
         return $cookieCopy;      
     }
 }
