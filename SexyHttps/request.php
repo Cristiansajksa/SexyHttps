@@ -26,7 +26,6 @@ class SexyHttps
     public static int $retrysCount = 0;
 
 
-    public static array $keepProxys = [];
     public static array $keepConfig, $keepHeader;
     public static ?string $keepMethod;
     public static mixed $keepMsgPost;
@@ -42,5 +41,29 @@ class SexyHttps
         self::$objectCookie = new CookieRequest();
         self::$objectProxys = new ProxysRequest();
         self::$objectOthor = new OthorRequest();
+    }
+
+
+
+    public static function Run( 
+        string $msgExecute = "", string|array $searchCoin = "searchCoinSexy", bool $retry = false 
+    ) : object | bool
+    {
+        if (empty(sexyHttps::$objectCurl)) {
+            return false;
+        }
+
+        curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$configCurl );
+        
+        $resp = $retry ?  
+        self::executeRetrys($msgExecute, $searchCoin) : 
+        curl_exec(sexyHttps::$objectCurl);
+
+        self::$objectCookie->ParseCookie( $resp );
+        self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
+        curl_close( sexyHttps::$objectCurl );
+        
+        self::$keepConfig = [];
+        return (object) [ "result" => $resp, "jsonArray" => self::JsonParse($resp) ];
     }
 }
