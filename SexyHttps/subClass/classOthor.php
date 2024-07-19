@@ -4,10 +4,10 @@ class OthorRequest
     public function ModifyUrl(string $url) : void 
     {
         if (empty(parse_url($url)["host"])) {
-            throw new exception("Site no pass format! ");
+            throw new exception( "Site no pass format!" );
         }
-        sexyHttps::$objectCurl = curl_init( $url );
 
+        sexyHttps::$objectCurl = curl_init( $url );
         sexyHttps::$keepConfig[CURLOPT_URL] = $url;
         sexyHttps::$url = parse_url( $url )["host"] ?? $url;
     }
@@ -19,8 +19,6 @@ class OthorRequest
         sexyHttps::$objectCurl = curl_init();
         self::LoadHeader( sexyHttps::$keepHeader );
         curl_setopt_array( sexyHttps::$objectCurl, (sexyHttps::$keepConfig + sexyHttps::$configCurl) );
-
-        curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$keepProxys );
         self::LoadMethod( sexyHttps::$keepMethod, sexyHttps::$keepMsgPost );
     }
 
@@ -28,7 +26,7 @@ class OthorRequest
 
     public static function LoadHeader(array $headerInfo) : void
     {
-        !sexyHttps::$basicConfig["RotativeUserAgent"] ?: self::RotativeUserAgent( $headerInfo );
+        !sexyHttps::$basicConfig["RotativeUserAgent"] ?: self::RotativeUserAgent($headerInfo);
         curl_setopt( sexyHttps::$objectCurl, CURLOPT_HTTPHEADER, $headerInfo );
         sexyHttps::$keepHeader = $headerInfo;
     }
@@ -43,12 +41,9 @@ class OthorRequest
 
         if ($method == "GET") {
             curl_setopt( sexyHttps::$objectCurl, CURLOPT_HTTPGET, true );
-
         } else {
-            $method == "POST" ?
-            curl_setopt(sexyHttps::$objectCurl, CURLOPT_POST, true) :
-            curl_setopt(sexyHttps::$objectCurl, CURLOPT_CUSTOMREQUEST, $method);
-
+            $configCurl = $method == "POST" ? CURLOPT_POST : CURLOPT_CUSTOMREQUEST;
+            curl_setopt( sexyHttps::$objectCurl, $configCurl, $method );
             curl_setopt( sexyHttps::$objectCurl, CURLOPT_POSTFIELDS, $msgPost );
         }
     }
@@ -58,7 +53,7 @@ class OthorRequest
     private static function RotativeUserAgent(array &$headerInfo) : null
     {
         $userAgentList = json_decode( 
-            file_get_contents( __DIR__ . "\UserAgent.json" ), true 
+            file_get_contents(__DIR__ . "\UserAgent.json"), true 
         )["UserAgent"];
 
         foreach ($headerInfo as &$header) {
