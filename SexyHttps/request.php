@@ -1,6 +1,10 @@
 <?php
 class SexyHttps 
 {
+    use TraitToolsRequest;
+    use TraitMethodsRequest;
+    use TraitRetrysRequest;
+
     public static array $cookieSession = [];
     public static array $basicConfig = 
     [
@@ -33,9 +37,6 @@ class SexyHttps
     private static object $objectCookie, $objectOthor, $objectProxys;
 
 
-    use TraitToolsRequest, TraitMethodsRequest, TraitRetrysRequest;
-
-
     private static function builder() 
     {
         self::$objectCookie = new CookieRequest();
@@ -61,9 +62,8 @@ class SexyHttps
 
         self::$objectCookie->ParseCookie( $resp );
         self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
-        curl_close( sexyHttps::$objectCurl );
-        
         self::$keepConfig = [];
-        return (object) [ "result" => $resp, "jsonArray" => self::JsonParse($resp) ];
+        
+        return (object) ["result" => $resp, "jsonArray" => self::JsonParse($resp)];
     }
 }
