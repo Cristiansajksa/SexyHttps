@@ -3,59 +3,41 @@ trait TraitRetrysRequest
 {
     private static function executeRetrys(string $msgExecute, string|array $searchCoin) : string
     {
-        return is_array($searchCoin) ? 
-        self::retrysArray($msgExecute, $searchCoin) : 
-        self::retrysString($msgExecute, $searchCoin);
-    }
-
-
-
-    private static function checkResult(int $countRetrys) : void
-    {
-        if ($countRetrys >= 7) {
-            throw new exception( "retry exceeded! (7)" );
-        }
-        sexyHttps::$retrysCount += $countRetrys;
-    }
-
-
-    
-    private static function retrysArray(?string $msgExecute, array $searchCoin) : string
-    {
-        $countRetrys = 0;
-        
-        while ($countRetrys <= 7) {
-            !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
-            $resp = curl_exec( sexyHttps::$objectCurl );
-
-            foreach ($searchCoin as $coinsString) {
-                if (stristr($resp, $coinsString) || $resp == $msgExecute) {
-                    $countRetrys++;
-                    continue 2;
-                }
-            }
-
-            break;
-        }
-        
-        self::checkResult( $countRetrys );
-        return $resp;
-    }
-
-
-    
-    private static function retrysString(?string $msgExecute, string $searchCoin) : string
-    {
-        $countRetrys = 0;
-        
-        do {
-            !sexyHttps::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
-            $resp = curl_exec( sexyHttps::$objectCurl );
+        for (
+            $countRetrys = 0;
+            self::retry($msgExecute, $searchCoin) and $countRetrys < 10;
             $countRetrys++;
-        } while ((stristr($resp, $searchCoin) || $msgExecute == $resp) and $countRetrys <= 7); 
+        );
 
-        $countRetrys--;
-        self::checkResult( $countRetrys );
-        return $resp;
+        if ($countRetrys == 10) {
+            throw new exception( "retry exceeded! (10)" );
+        }
+    }
+
+
+
+    private static function retry(?string $msgExecute, string|array $searchCoin) : string
+    {
+        !self::$basicConfig["NewCurlRetry"] ?: self::$objectOthor->NewObjectCurl();
+        $resp = curl_exec( self::$objectCurl );
+        $primaryIp = curl_getinfo( self::$objectCurl )["primary_ip"];
+
+        return empty($primaryIp) || self::searchHtml($resp, $searchCoin) || $resp == $msgExecute;
+    }
+
+
+
+    private static function searchHtml(string $html, string|array $searchCoin) : bool 
+    {
+        $searchCoin = (array) $searchCoin;
+
+        foreach ($searchCoina as $stringCoin) {
+            $resultSearch = stristr( $html, $searchCoin );
+            if ($resultSearch) {
+                break;
+            }
+        }
+
+        return $resultSearch;
     }
 }
