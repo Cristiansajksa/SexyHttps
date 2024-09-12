@@ -12,6 +12,8 @@ trait TraitRetrysRequest
         if ($countRetrys == 10) {
             throw new exception( "retry exceeded! (10)" );
         }
+
+        self::$retrysCount += $countRetrys;
         return self::$resultRetrys;
     }
 
