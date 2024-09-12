@@ -10,20 +10,18 @@ class ProxysRequest
 
     public static function VerifyConstValueArray(array &$arrayInfo) : void
     {
-        foreach ($arrayInfo as $key => $value) {
-            unset( $arrayInfo[$key] );
-            if (!defined($key)) {
+        foreach ($arrayInfo as $constCurl => $valuesCurls) {
+            unset( $arrayInfo[$constCurl] );
+            if (!defined($constCurl)) {
                 continue;
             }
 
-            if (is_file($value)) {
-                $keepProxys = file( $value, FILE_IGNORE_NEW_LINES );
-                $value = $keepProxys[array_rand($keepProxys)];
-            } else {
-                $value = $value;
+            if (is_file($valuesCurls)) {
+                $keepProxys = file( $valuesCurls, FILE_IGNORE_NEW_LINES );
+                $valuesCurls = $keepProxys[array_rand($keepProxys)];
             }
             
-            $arrayInfo[constant($key)] = $value;
+            $arrayInfo[constant($constCurl)] = $valuesCurls;
         }
     }
 }
