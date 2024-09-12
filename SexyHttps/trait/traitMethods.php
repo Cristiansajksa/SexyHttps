@@ -14,7 +14,7 @@ trait TraitMethodsRequest
         self::$objectOthor->ModifyUrl( $url );
         !$cookie ?: self::$objectCookie->UsedCookie($url);
 
-        empty($serverProxy) ?: self::$objectProxys->UsedProxys($serverProxy);
+        empty($serverProxy) ?: self::$objectProxys->keepProxys($serverProxy);
         self::$objectOthor->LoadHeader( $header );
         self::$objectOthor->LoadMethod( $method, $postField );
         return new self();
