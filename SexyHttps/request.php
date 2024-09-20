@@ -34,6 +34,7 @@ class SexyHttps
     public static ?string $keepMethod;
     public static mixed $keepMsgPost;
 
+    private static string $resultRetrys; 
     private static object $objectCookie, $objectOthor, $objectProxys;
 
 
@@ -56,9 +57,10 @@ class SexyHttps
 
         curl_setopt_array( sexyHttps::$objectCurl, sexyHttps::$configCurl );
         
-        $resp = $retry ?  
-        self::executeRetrys($msgExecute, $searchCoin) : 
-        curl_exec(sexyHttps::$objectCurl);
+        $resp = match ($retry) {
+            true => self::executeRetrys($msgExecute, $searchCoin),
+            false => curl_exec(sexyHttps::$objectCurl)
+        };
 
         self::$objectCookie->ParseCookie( $resp );
         self::$timeTotal += curl_getinfo( self::$objectCurl )["total_time"];
